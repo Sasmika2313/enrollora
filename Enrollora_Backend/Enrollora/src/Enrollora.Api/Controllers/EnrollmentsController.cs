@@ -9,42 +9,91 @@ namespace Enrollora.Api.Controllers;
 [ApiController]
 [Route("api/enrollments")]
 [Authorize]
-public sealed class EnrollmentsController(IEnrollmentService service) : ControllerBase
+public sealed class EnrollmentsController(
+    IEnrollmentService service) : ControllerBase
 {
+    // ADMIN
+    // GET: /api/enrollments
     [HttpGet]
     [Authorize(Roles = "Administrator")]
     public Task<PagedResult<EnrollmentResponse>> GetAll(
-        [FromQuery] EnrollmentQuery query, CancellationToken ct) =>
+        [FromQuery] EnrollmentQuery query,
+        CancellationToken ct) =>
         service.GetAllAsync(query, ct);
 
+
+    // STUDENT
+    // GET: /api/enrollments/my
     [HttpGet("my")]
     [Authorize(Roles = "Student")]
     public Task<PagedResult<EnrollmentResponse>> GetMine(
-        [FromQuery] EnrollmentQuery query, CancellationToken ct) =>
-        service.GetMineAsync(CurrentStudentId(), query, ct);
+        [FromQuery] EnrollmentQuery query,
+        CancellationToken ct) =>
+        service.GetMineAsync(
+            CurrentStudentId(),
+            query,
+            ct);
 
+
+    // ADMIN
+    // GET: /api/enrollments/student/1
     [HttpGet("student/{studentId:int}")]
     [Authorize(Roles = "Administrator")]
     public Task<PagedResult<EnrollmentResponse>> GetForStudent(
-        int studentId, [FromQuery] EnrollmentQuery query, CancellationToken ct) =>
-        service.GetForStudentAsync(studentId, query, ct);
+        int studentId,
+        [FromQuery] EnrollmentQuery query,
+        CancellationToken ct) =>
+        service.GetForStudentAsync(
+            studentId,
+            query,
+            ct);
 
+
+    // ADMIN
+    // GET: /api/enrollments/course/1
     [HttpGet("course/{courseId:int}")]
     [Authorize(Roles = "Administrator")]
     public Task<PagedResult<EnrollmentResponse>> GetForCourse(
-        int courseId, [FromQuery] EnrollmentQuery query, CancellationToken ct) =>
-        service.GetForCourseAsync(courseId, query, ct);
+        int courseId,
+        [FromQuery] EnrollmentQuery query,
+        CancellationToken ct) =>
+        service.GetForCourseAsync(
+            courseId,
+            query,
+            ct);
 
+
+    // STUDENT
+    // POST: /api/enrollments
     [HttpPost]
     [Authorize(Roles = "Student")]
     public async Task<IActionResult> Create(
-        CreateEnrollmentRequest request, CancellationToken ct)
+        [FromBody] CreateEnrollmentRequest request,
+        CancellationToken ct)
     {
-        var result = await service.CreateAsync(CurrentStudentId(), request.CourseId, ct);
-        return CreatedAtAction(nameof(GetMine), result);
+        var result = await service.CreateAsync(
+            CurrentStudentId(),
+            request.CourseId,
+            ct);
+
+        return StatusCode(
+            StatusCodes.Status201Created,
+            result);
     }
 
-    private int CurrentStudentId() =>
-        int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? throw new UnauthorizedAccessException("Student identity is missing."));
+
+    private int CurrentStudentId()
+    {
+        var studentId =
+            User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrWhiteSpace(studentId))
+        {
+            throw new UnauthorizedAccessException(
+                "Student identity is missing.");
+        }
+
+        return int.Parse(studentId);
+    }
 }

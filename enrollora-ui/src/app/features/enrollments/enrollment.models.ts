@@ -8,6 +8,10 @@ export interface EnrollmentResponse {
   courseId: number;
   courseName: string;
   enrolledAt: string;
+
+  // Backend enum:
+  // Active = 0
+  // Cancelled = 1
   status: number;
 }
 
@@ -23,4 +27,5 @@ export interface EnrollmentFilter {
   toDate?: string;
 }
 
-export type EnrollmentPagedResult = PagedResult<EnrollmentResponse>;
+export type EnrollmentPagedResult =
+  PagedResult<EnrollmentResponse>;

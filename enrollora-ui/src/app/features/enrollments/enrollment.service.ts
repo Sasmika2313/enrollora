@@ -1,9 +1,19 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import {
+  HttpClient,
+  HttpParams,
+} from '@angular/common/http';
+
+import {
+  Injectable,
+  inject,
+} from '@angular/core';
+
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
+
 import { PagedResult } from '../../shared/models/paged-result.model';
+
 import {
   CreateEnrollmentRequest,
   EnrollmentFilter,
@@ -14,34 +24,60 @@ import {
   providedIn: 'root',
 })
 export class EnrollmentService {
-  private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/enrollments`;
 
+  private readonly http = inject(HttpClient);
+
+  private readonly apiUrl =
+    `${environment.apiUrl}/enrollments`;
+
+
+  // ADMIN
   getEnrollments(
     pageNumber = 1,
     pageSize = 10,
     filters?: EnrollmentFilter,
   ): Observable<PagedResult<EnrollmentResponse>> {
-    return this.http.get<PagedResult<EnrollmentResponse>>(this.apiUrl, {
-      params: this.buildParams(pageNumber, pageSize, filters),
-    });
+
+    return this.http.get<PagedResult<EnrollmentResponse>>(
+      this.apiUrl,
+      {
+        params: this.buildParams(
+          pageNumber,
+          pageSize,
+          filters,
+        ),
+      },
+    );
   }
 
+
+  // STUDENT
   getMyEnrollments(
     pageNumber = 1,
     pageSize = 10,
     filters?: EnrollmentFilter,
   ): Observable<PagedResult<EnrollmentResponse>> {
-    return this.http.get<PagedResult<EnrollmentResponse>>(`${this.apiUrl}/my`, {
-      params: this.buildParams(pageNumber, pageSize, filters),
-    });
+
+    return this.http.get<PagedResult<EnrollmentResponse>>(
+      `${this.apiUrl}/my`,
+      {
+        params: this.buildParams(
+          pageNumber,
+          pageSize,
+          filters,
+        ),
+      },
+    );
   }
 
+
+  // ADMIN
   getEnrollmentsByStudent(
     studentId: number,
     pageNumber = 1,
     pageSize = 10,
   ): Observable<PagedResult<EnrollmentResponse>> {
+
     const params = new HttpParams()
       .set('pageNumber', pageNumber)
       .set('pageSize', pageSize);
@@ -52,11 +88,14 @@ export class EnrollmentService {
     );
   }
 
+
+  // ADMIN
   getEnrollmentsByCourse(
     courseId: number,
     pageNumber = 1,
     pageSize = 10,
   ): Observable<PagedResult<EnrollmentResponse>> {
+
     const params = new HttpParams()
       .set('pageNumber', pageNumber)
       .set('pageSize', pageSize);
@@ -67,33 +106,62 @@ export class EnrollmentService {
     );
   }
 
-  createEnrollment(request: CreateEnrollmentRequest): Observable<EnrollmentResponse> {
-    return this.http.post<EnrollmentResponse>(this.apiUrl, request);
+
+  // STUDENT
+  createEnrollment(
+    request: CreateEnrollmentRequest,
+  ): Observable<EnrollmentResponse> {
+
+    return this.http.post<EnrollmentResponse>(
+      this.apiUrl,
+      request,
+    );
   }
+
 
   private buildParams(
     pageNumber: number,
     pageSize: number,
     filters?: EnrollmentFilter,
   ): HttpParams {
+
     let params = new HttpParams()
       .set('pageNumber', pageNumber)
       .set('pageSize', pageSize);
 
     if (filters?.search) {
-      params = params.set('search', filters.search);
+      params = params.set(
+        'search',
+        filters.search,
+      );
     }
+
     if (filters?.courseId != null) {
-      params = params.set('courseId', filters.courseId);
+      params = params.set(
+        'courseId',
+        filters.courseId,
+      );
     }
+
     if (filters?.status != null) {
-      params = params.set('status', filters.status);
+      params = params.set(
+        'status',
+        filters.status,
+      );
     }
+
     if (filters?.fromDate) {
-      params = params.set('fromDate', filters.fromDate);
+      params = params.set(
+        'fromDate',
+        filters.fromDate,
+      );
     }
+
     if (filters?.toDate) {
-      params = params.set('toDate', filters.toDate);
+      params = params.set(
+        'toDate',
+        filters.toDate,
+      );
     }
 
     return params;
