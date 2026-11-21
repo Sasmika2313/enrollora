@@ -85,10 +85,10 @@
               <td>
                 <span
                   class="status-badge"
-                  [class.active]="enrollment.status === 0"
-                  [class.inactive]="enrollment.status !== 0"
+                  [style.background-color]="enrollment.status === 0 ? '#e4f8ed' : '#fff0e9'"
+                  [style.color]="enrollment.status === 0 ? '#16864b' : '#dc6541'"
                 >
-                  {{ enrollment.status === 0 ? 'Active' : 'Cancelled' }}
+                {{ enrollment.status === 0 ? 'Active' : 'Cancelled' }}
                 </span>
               </td>
             </tr>
