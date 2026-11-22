@@ -1,0 +1,179 @@
+
+<div class="profile-page">
+
+  <div class="page-header">
+    <div>
+      <h2>My Profile</h2>
+      <p>View and manage your personal information.</p>
+    </div>
+
+    <div class="profile-icon">
+      👤
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-card">
+      Loading profile...
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="error-message">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <!-- TEMPORARY DEBUG CODE - START -->
+  <!-- @if (!isLoading) {
+    <div class="profile-card">
+
+      <h3>Profile Debug Information</h3>
+
+      <p><strong>Check the browser console (F12) for the API response.</strong></p>
+
+      <p>Student Name: {{ profile.name || 'No name received' }}</p>
+      <p>Email: {{ profile.email || 'No email received' }}</p>
+      <p>Student ID: {{ profile.studentId || 'No ID received' }}</p>
+
+      <p>
+        If an error message appears above, note the HTTP status code.
+      </p>
+
+    </div>
+  } -->
+  <!-- TEMPORARY DEBUG CODE - END -->
+
+  @if (!isLoading && !errorMessage) {
+    <div class="profile-card">
+
+      <div class="profile-card-header">
+        <div class="avatar">
+          {{ profile.name.charAt(0).toUpperCase() }}
+        </div>
+
+        <div>
+          <h3>{{ profile.name }}</h3>
+          <p>{{ profile.email }}</p>
+        </div>
+      </div>
+
+      @if (successMessage) {
+        <div class="success-message">
+          {{ successMessage }}
+        </div>
+      }
+
+      <form (ngSubmit)="saveProfile()" #profileForm="ngForm">
+
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label>Full Name</label>
+            <input
+              type="text"
+              name="name"
+              [(ngModel)]="profile.name"
+              required
+              maxlength="120"
+              placeholder="Enter your full name"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              [value]="profile.email"
+              readonly
+              class="readonly-input"
+            />
+            <small>Email cannot be changed here.</small>
+          </div>
+
+          <div class="form-group">
+            <label>Department</label>
+            <input
+              type="text"
+              name="department"
+              [(ngModel)]="profile.department"
+              required
+              maxlength="100"
+              placeholder="Enter your department"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Age</label>
+            <input
+              type="number"
+              name="age"
+              [(ngModel)]="profile.age"
+              required
+              min="17"
+              max="60"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>CGPA</label>
+            <input
+              type="number"
+              name="cgpa"
+              [(ngModel)]="profile.cgpa"
+              required
+              min="0"
+              max="10"
+              step="0.01"
+            />
+          </div>
+
+        </div>
+
+        <div class="profile-details">
+
+          <div>
+            <span>Student ID</span>
+            <strong>{{ profile.studentId }}</strong>
+          </div>
+
+          <div>
+            <span>Status</span>
+
+            @if (profile.status === 1) {
+              <strong class="status approved">Approved</strong>
+            } @else if (profile.status === 0) {
+              <strong class="status pending">Pending</strong>
+            } @else {
+              <strong class="status rejected">Rejected</strong>
+            }
+          </div>
+
+          <div>
+            <span>Registered On</span>
+            <strong>{{ profile.registeredAt | date:'dd MMM yyyy' }}</strong>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="submit"
+            class="save-button"
+            [disabled]="profileForm.invalid || isSaving"
+          >
+            @if (isSaving) {
+              Saving...
+            } @else {
+              Save Changes
+            }
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  }
+
+
+</div>
