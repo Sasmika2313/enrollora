@@ -34,13 +34,18 @@ export const routes: Routes = [
             (m) => m.CourseListComponent,
           ),
       },
-
       {
         path: 'enrollments',
         loadComponent: () =>
           import('./features/enrollments/admin/enrollment-list/enrollment-list').then(
             (m) => m.EnrollmentListComponent,
           ),
+      },
+      {
+        path: 'cancellation-requests',
+        loadComponent: () =>
+          import('./features/admin/cancellation-requests/cancellation-requests/cancellation-requests')
+            .then((m) => m.CancellationRequests),
       },
     ],
   },

@@ -15,7 +15,9 @@ import { environment } from '../../../environments/environment';
 import { PagedResult } from '../../shared/models/paged-result.model';
 
 import {
+  CreateCancellationRequest,
   CreateEnrollmentRequest,
+  CancellationResponse,
   EnrollmentFilter,
   EnrollmentResponse,
 } from './enrollment.models';
@@ -118,6 +120,34 @@ export class EnrollmentService {
     );
   }
 
+  // STUDENT
+getMyCancellationRequests(
+  pageNumber = 1,
+  pageSize = 10,
+): Observable<PagedResult<CancellationResponse>> {
+
+  const params = new HttpParams()
+    .set('pageNumber', pageNumber)
+    .set('pageSize', pageSize);
+
+  return this.http.get<PagedResult<CancellationResponse>>(
+    `${environment.apiUrl}/cancellation-requests/my`,
+    { params },
+  );
+}
+
+
+// STUDENT
+createCancellationRequest(
+  enrollmentId: number,
+  request: CreateCancellationRequest,
+): Observable<CancellationResponse> {
+
+  return this.http.post<CancellationResponse>(
+    `${environment.apiUrl}/enrollments/${enrollmentId}/cancellation-request`,
+    request,
+  );
+}
 
   private buildParams(
     pageNumber: number,
