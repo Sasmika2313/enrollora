@@ -776,3 +776,41 @@ td {
   }
 
 }
+
+/* Cancellation status display */
+.cancellation-status-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 7px;
+}
+
+.cancellation-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.cancellation-approved {
+  background: #d4edda;
+  color: #155724;
+}
+
+.cancellation-rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.cancellation-remarks {
+  display: block;
+  max-width: 220px;
+  color: #721c24;
+  line-height: 1.4;
+  white-space: normal;
+}
+
+.no-action {
+  color: #856404;
+  font-size: 13px;
+  font-weight: 600;
+}

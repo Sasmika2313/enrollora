@@ -1,3 +1,4 @@
+
 import { CommonModule } from '@angular/common';
 
 import {
@@ -12,6 +13,7 @@ import {
 } from '@angular/core';
 
 import {
+  CancellationResponse,
   CreateCancellationRequest,
   EnrollmentResponse,
 } from '../../enrollment.models';
@@ -33,6 +35,9 @@ export class MyEnrollments implements OnInit {
   enrollments =
     signal<EnrollmentResponse[]>([]);
 
+  cancellationRequests =
+    signal<CancellationResponse[]>([]);
+
   isLoading =
     signal(false);
 
@@ -50,6 +55,7 @@ export class MyEnrollments implements OnInit {
 
   totalPages =
     signal(0);
+
 
   // Cancellation request state
   selectedEnrollment =
@@ -76,7 +82,6 @@ export class MyEnrollments implements OnInit {
   loadEnrollments(): void {
 
     this.isLoading.set(true);
-
     this.errorMessage.set('');
 
     this.enrollmentService
@@ -88,19 +93,16 @@ export class MyEnrollments implements OnInit {
 
         next: (response) => {
 
-          this.enrollments.set(
-            response.items,
-          );
+          this.enrollments.set(response.items);
 
-          this.totalRecords.set(
-            response.totalRecords,
-          );
+          this.totalRecords.set(response.totalRecords);
 
-          this.totalPages.set(
-            response.totalPages,
-          );
+          this.totalPages.set(response.totalPages);
 
           this.isLoading.set(false);
+
+          // Load cancellation history after enrollments load.
+          this.loadCancellationRequests();
         },
 
         error: (error: HttpErrorResponse) => {
@@ -120,6 +122,37 @@ export class MyEnrollments implements OnInit {
   }
 
 
+  loadCancellationRequests(): void {
+
+    this.enrollmentService
+      .getMyCancellationRequests()
+      .subscribe({
+
+        next: (response) => {
+          this.cancellationRequests.set(response.items);
+        },
+
+        error: (error: HttpErrorResponse) => {
+          console.error(
+            'Unable to load cancellation requests:',
+            error,
+          );
+        },
+      });
+  }
+
+
+  // Find the latest cancellation request for an enrollment.
+  cancellationFor(
+    enrollmentId: number,
+  ): CancellationResponse | undefined {
+
+    return this.cancellationRequests().find(
+      request => request.enrollmentId === enrollmentId,
+    );
+  }
+
+
   statusLabel(status: number): string {
 
     if (status === 0) {
@@ -130,9 +163,49 @@ export class MyEnrollments implements OnInit {
   }
 
 
+  cancellationStatusLabel(status: number): string {
+
+    switch (status) {
+      case 0:
+        return 'Cancellation Pending';
+
+      case 1:
+        return 'Cancellation Approved';
+
+      case 2:
+        return 'Cancellation Rejected';
+
+      default:
+        return 'Unknown';
+    }
+  }
+
+
+  // A new request is allowed only when the enrollment is active
+  // and its latest cancellation request is not pending or approved.
+  canRequestCancellation(
+    enrollment: EnrollmentResponse,
+  ): boolean {
+
+    if (enrollment.status !== 0) {
+      return false;
+    }
+
+    const request = this.cancellationFor(
+      enrollment.enrollmentId,
+    );
+
+    return !request || request.status === 2;
+  }
+
+
   openCancellationForm(
     enrollment: EnrollmentResponse,
   ): void {
+
+    if (!this.canRequestCancellation(enrollment)) {
+      return;
+    }
 
     this.selectedEnrollment.set(enrollment);
     this.cancellationReason.set('');
@@ -143,6 +216,10 @@ export class MyEnrollments implements OnInit {
 
   closeCancellationForm(): void {
 
+    if (this.isSubmittingCancellation()) {
+      return;
+    }
+
     this.selectedEnrollment.set(null);
     this.cancellationReason.set('');
     this.cancellationMessage.set('');
@@ -152,13 +229,19 @@ export class MyEnrollments implements OnInit {
 
   submitCancellationRequest(): void {
 
-    const enrollment =
-      this.selectedEnrollment();
+    const enrollment = this.selectedEnrollment();
 
-    const reason =
-      this.cancellationReason().trim();
+    const reason = this.cancellationReason().trim();
 
     if (!enrollment) {
+      return;
+    }
+
+    // Prevent duplicate submissions while a request is pending.
+    if (!this.canRequestCancellation(enrollment)) {
+      this.cancellationError.set(
+        'A cancellation request is already pending or has been approved.',
+      );
       return;
     }
 
@@ -184,17 +267,23 @@ export class MyEnrollments implements OnInit {
       )
       .subscribe({
 
-        next: () => {
+        next: (response) => {
 
           this.isSubmittingCancellation.set(false);
+
+          // Update the cancellation history immediately.
+          this.cancellationRequests.update(requests => [
+            response,
+            ...requests.filter(
+              item => item.enrollmentId !== response.enrollmentId,
+            ),
+          ]);
 
           this.cancellationMessage.set(
             'Cancellation request submitted successfully.',
           );
 
           this.cancellationReason.set('');
-
-          this.loadEnrollments();
         },
 
         error: (error: HttpErrorResponse) => {
@@ -209,6 +298,9 @@ export class MyEnrollments implements OnInit {
           );
 
           this.isSubmittingCancellation.set(false);
+
+          // Refresh history in case the server already has a pending request.
+          this.loadCancellationRequests();
         },
       });
   }

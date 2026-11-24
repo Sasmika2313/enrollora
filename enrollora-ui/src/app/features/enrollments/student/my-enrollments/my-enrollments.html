@@ -1,3 +1,4 @@
+
 <div class="enrollment-page">
 
   <!-- Page Header -->
@@ -20,7 +21,6 @@
 
   }
 
-
   <!-- Error -->
   @else if (errorMessage()) {
 
@@ -38,7 +38,6 @@
 
   }
 
-
   <!-- Empty -->
   @else if (enrollments().length === 0) {
 
@@ -49,7 +48,6 @@
     </div>
 
   }
-
 
   <!-- Enrollment Table -->
   @else {
@@ -121,23 +119,66 @@
 
                   </span>
 
+                  @if (cancellationFor(enrollment.enrollmentId); as cancellation) {
+
+                    <div class="cancellation-status-info">
+
+                      <span
+                        class="status-badge"
+                        [class.cancellation-pending]="cancellation.status === 0"
+                        [class.cancellation-approved]="cancellation.status === 1"
+                        [class.cancellation-rejected]="cancellation.status === 2">
+
+                        {{ cancellationStatusLabel(cancellation.status) }}
+
+                      </span>
+
+                      @if (
+                        cancellation.status === 2 &&
+                        cancellation.adminRemarks
+                      ) {
+
+                        <small class="cancellation-remarks">
+                          Admin remarks: {{ cancellation.adminRemarks }}
+                        </small>
+
+                      }
+
+                    </div>
+
+                  }
+
                 </td>
 
 
                 <!-- Action -->
                 <td>
 
-                  @if (enrollment.status === 0) {
+                  @if (canRequestCancellation(enrollment)) {
 
                     <button
                       class="cancel-request-btn"
                       (click)="openCancellationForm(enrollment)">
 
-                      Request Cancellation
+                      @if (cancellationFor(enrollment.enrollmentId)?.status === 2) {
+                        Request Again
+                      } @else {
+                        Request Cancellation
+                      }
 
                     </button>
 
-                  } @else {
+                  }
+
+                  @else if (cancellationFor(enrollment.enrollmentId)?.status === 0) {
+
+                    <span class="no-action">
+                      Request Pending
+                    </span>
+
+                  }
+
+                  @else {
 
                     <span class="no-action">
                       —
@@ -223,7 +264,8 @@
         <button
           class="close-btn"
           type="button"
-          (click)="closeCancellationForm()">
+          (click)="closeCancellationForm()"
+          [disabled]="isSubmittingCancellation()">
 
           ×
 
@@ -333,7 +375,9 @@
 
         </div>
 
-      } @else {
+      }
+
+      @else {
 
         <div class="modal-success-actions">
 

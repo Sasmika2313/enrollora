@@ -1,3 +1,4 @@
+
 import { PagedResult } from '../../shared/models/paged-result.model';
 
 export interface EnrollmentResponse {
@@ -23,7 +24,13 @@ export interface CancellationResponse {
   studentEmail: string;
   courseName: string;
   reason: string;
+
+  // Backend enum:
+  // Pending = 0
+  // Approved = 1
+  // Rejected = 2
   status: number;
+
   requestedAt: string;
   reviewedAt: string | null;
   adminRemarks: string | null;

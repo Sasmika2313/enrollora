@@ -1,6 +1,7 @@
 
 <div class="cancellation-page">
 
+  <!-- Page Header -->
   <div class="page-header">
     <div>
       <span class="eyebrow">ENROLLMENT MANAGEMENT</span>
@@ -18,12 +19,37 @@
     </button>
   </div>
 
+  <!-- Status Filter: Always Visible -->
+  <div class="filter-section">
+
+    <div class="filter-label">
+      <label for="statusFilter">Filter by Status</label>
+      <small>View requests based on their current status</small>
+    </div>
+
+    <select
+      id="statusFilter"
+      class="status-filter"
+      [value]="selectedStatus ?? ''"
+      (change)="onStatusChange($any($event.target).value)">
+
+      <option value="">All Requests</option>
+      <option value="0">Pending</option>
+      <option value="1">Approved</option>
+      <option value="2">Rejected</option>
+
+    </select>
+
+  </div>
+
+  <!-- Success Message -->
   @if (successMessage) {
     <div class="review-success">
       ✓ {{ successMessage }}
     </div>
   }
 
+  <!-- Loading State -->
   @if (isLoading) {
 
     <div class="state-card">
@@ -32,6 +58,8 @@
     </div>
 
   }
+
+  <!-- Error State -->
   @else if (errorMessage && requests.length === 0) {
 
     <div class="state-card error-state">
@@ -44,15 +72,25 @@
     </div>
 
   }
+
+  <!-- Empty State -->
   @else if (requests.length === 0) {
 
     <div class="state-card">
       <span class="empty-icon">📋</span>
+
       <h3>No cancellation requests</h3>
-      <p>There are no cancellation requests to review.</p>
+
+      <p>
+        {{ selectedStatus === undefined
+          ? 'There are no cancellation requests to review.'
+          : 'No requests found for this status.' }}
+      </p>
     </div>
 
   }
+
+  <!-- Requests Table -->
   @else {
 
     @if (refreshError) {

@@ -32,9 +32,13 @@ export class CancellationRequests implements OnInit {
 
   isLoading = false;
   isRefreshing = false;
+  hasLoaded = false;
 
   errorMessage = '';
   refreshError = '';
+
+  // Status filter
+  selectedStatus: number | undefined = undefined;
 
   // Review modal properties
   selectedRequest: CancellationRequest | null = null;
@@ -51,7 +55,7 @@ export class CancellationRequests implements OnInit {
 
   loadRequests(): void {
 
-    const isInitialLoad = this.requests.length === 0;
+    const isInitialLoad = !this.hasLoaded;
 
     if (isInitialLoad) {
       this.isLoading = true;
@@ -62,7 +66,11 @@ export class CancellationRequests implements OnInit {
     this.errorMessage = '';
     this.refreshError = '';
 
-    this.cancellationService.getAll()
+    this.cancellationService.getAll(
+      1,
+      10,
+      this.selectedStatus
+    )
       .pipe(
         finalize(() => {
           this.isLoading = false;
@@ -73,6 +81,7 @@ export class CancellationRequests implements OnInit {
       .subscribe({
         next: (response) => {
           this.requests = response.items;
+          this.hasLoaded = true;
           this.cdr.detectChanges();
         },
         error: (error) => {
@@ -86,9 +95,18 @@ export class CancellationRequests implements OnInit {
               'Could not refresh requests. Showing previously loaded data.';
           }
 
+          this.hasLoaded = true;
           this.cdr.detectChanges();
         },
       });
+  }
+
+  onStatusChange(value: string): void {
+
+    this.selectedStatus =
+      value === '' ? undefined : Number(value);
+
+    this.loadRequests();
   }
 
   statusLabel(status: number): string {
@@ -164,7 +182,6 @@ export class CancellationRequests implements OnInit {
       .subscribe({
         next: (updatedRequest) => {
 
-          // Update the existing row without reloading the entire page.
           this.requests = this.requests.map(request =>
             request.cancellationRequestId === requestId
               ? updatedRequest

@@ -1,3 +1,4 @@
+
 import {
   HttpClient,
   HttpParams,
@@ -120,34 +121,37 @@ export class EnrollmentService {
     );
   }
 
-  // STUDENT
-getMyCancellationRequests(
-  pageNumber = 1,
-  pageSize = 10,
-): Observable<PagedResult<CancellationResponse>> {
 
-  const params = new HttpParams()
-    .set('pageNumber', pageNumber)
-    .set('pageSize', pageSize);
+  // STUDENT: Get the current student's cancellation history
+  getMyCancellationRequests(
+    pageNumber = 1,
+    pageSize = 100,
+  ): Observable<PagedResult<CancellationResponse>> {
 
-  return this.http.get<PagedResult<CancellationResponse>>(
-    `${environment.apiUrl}/cancellation-requests/my`,
-    { params },
-  );
-}
+    const params = new HttpParams()
+      .set('pageNumber', pageNumber)
+      .set('pageSize', pageSize)
+      .set('sortOrder', 'desc');
+
+    return this.http.get<PagedResult<CancellationResponse>>(
+      `${environment.apiUrl}/cancellation-requests/my`,
+      { params },
+    );
+  }
 
 
-// STUDENT
-createCancellationRequest(
-  enrollmentId: number,
-  request: CreateCancellationRequest,
-): Observable<CancellationResponse> {
+  // STUDENT: Submit a cancellation request
+  createCancellationRequest(
+    enrollmentId: number,
+    request: CreateCancellationRequest,
+  ): Observable<CancellationResponse> {
 
-  return this.http.post<CancellationResponse>(
-    `${environment.apiUrl}/enrollments/${enrollmentId}/cancellation-request`,
-    request,
-  );
-}
+    return this.http.post<CancellationResponse>(
+      `${environment.apiUrl}/enrollments/${enrollmentId}/cancellation-request`,
+      request,
+    );
+  }
+
 
   private buildParams(
     pageNumber: number,

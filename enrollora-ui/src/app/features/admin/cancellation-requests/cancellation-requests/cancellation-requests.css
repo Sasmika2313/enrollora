@@ -520,3 +520,59 @@ td small {
     width: 100%;
   }
 }
+
+.filter-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 18px;
+  padding: 16px 20px;
+  background: #fff;
+  border: 1px solid #efedf4;
+  border-radius: 12px;
+}
+
+.filter-label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.filter-label label {
+  color: #342c47;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.filter-label small {
+  color: #9992a8;
+  font-size: 11px;
+}
+
+.status-filter {
+  min-width: 170px;
+  padding: 10px 13px;
+  border: 1px solid #e4d9f1;
+  border-radius: 8px;
+  background: #fbf9ff;
+  color: #49365f;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+}
+
+.status-filter:focus {
+  border-color: #8749ed;
+}
+
+@media (max-width: 576px) {
+  .filter-section {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .status-filter {
+    width: 100%;
+  }
+}
