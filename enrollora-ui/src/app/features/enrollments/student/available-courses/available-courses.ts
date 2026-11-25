@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+
 import {
   HttpErrorResponse,
 } from '@angular/common/http';
@@ -10,8 +11,13 @@ import {
   signal,
 } from '@angular/core';
 
-import { CourseResponse } from '../../../admin/courses/course.models';
+import {
+  CourseResponse,
+  CourseFilter,
+} from '../../../admin/courses/course.models';
+
 import { CourseService } from '../../../admin/courses/course.service';
+
 import { EnrollmentService } from '../../enrollment.service';
 
 @Component({
@@ -30,31 +36,47 @@ export class AvailableCourses implements OnInit {
     inject(EnrollmentService);
 
 
-  courses = signal<CourseResponse[]>([]);
+  courses =
+    signal<CourseResponse[]>([]);
 
-  isLoading = signal(false);
+  selectedCourse =
+    signal<CourseResponse | null>(null);
 
-  errorMessage = signal('');
+  isLoading =
+    signal(false);
 
-  successMessage = signal('');
+  errorMessage =
+    signal('');
 
-  enrollmentError = signal('');
+  successMessage =
+    signal('');
+
+  enrollmentError =
+    signal('');
 
   processingCourseId =
     signal<number | null>(null);
 
+  searchText =
+    signal('');
 
-  pageNumber = signal(1);
+  pageNumber =
+    signal(1);
 
-  pageSize = signal(9);
+  pageSize =
+    signal(9);
 
-  totalRecords = signal(0);
+  totalRecords =
+    signal(0);
 
-  totalPages = signal(0);
+  totalPages =
+    signal(0);
 
 
   ngOnInit(): void {
+
     this.loadCourses();
+
   }
 
 
@@ -64,15 +86,23 @@ export class AvailableCourses implements OnInit {
 
     this.errorMessage.set('');
 
+    const filters: CourseFilter = {
+
+      isActive: true,
+
+      availability: 'available',
+
+      search:
+        this.searchText().trim() || undefined,
+
+    };
+
 
     this.courseService
       .getCourses(
         this.pageNumber(),
         this.pageSize(),
-        {
-          isActive: true,
-          availability: 'available',
-        },
+        filters,
       )
       .subscribe({
 
@@ -91,6 +121,7 @@ export class AvailableCourses implements OnInit {
           );
 
           this.isLoading.set(false);
+
         },
 
         error: (error: HttpErrorResponse) => {
@@ -103,18 +134,65 @@ export class AvailableCourses implements OnInit {
           );
 
           this.isLoading.set(false);
+
         },
+
       });
+
   }
 
 
-  enroll(course: CourseResponse): void {
+  onSearchChange(
+    value: string,
+  ): void {
+
+    this.searchText.set(value);
+
+    this.pageNumber.set(1);
+
+    this.loadCourses();
+
+  }
+
+
+  clearSearch(): void {
+
+    this.searchText.set('');
+
+    this.pageNumber.set(1);
+
+    this.loadCourses();
+
+  }
+
+
+  viewDetails(
+    course: CourseResponse,
+  ): void {
+
+    this.selectedCourse.set(course);
+
+  }
+
+
+  closeDetails(): void {
+
+    this.selectedCourse.set(null);
+
+  }
+
+
+  enroll(
+    course: CourseResponse,
+  ): void {
 
     if (
       this.processingCourseId() !== null ||
       course.availableSeats <= 0
     ) {
+
       return;
+
     }
 
 
@@ -137,11 +215,14 @@ export class AvailableCourses implements OnInit {
 
           this.processingCourseId.set(null);
 
+          this.selectedCourse.set(null);
+
           this.successMessage.set(
             `You have successfully enrolled in ${course.courseName}.`,
           );
 
           this.loadCourses();
+
         },
 
         error: (error: HttpErrorResponse) => {
@@ -154,8 +235,11 @@ export class AvailableCourses implements OnInit {
               'Unable to enroll in this course.',
             ),
           );
+
         },
+
       });
+
   }
 
 
@@ -168,7 +252,9 @@ export class AvailableCourses implements OnInit {
       );
 
       this.loadCourses();
+
     }
+
   }
 
 
@@ -184,7 +270,9 @@ export class AvailableCourses implements OnInit {
       );
 
       this.loadCourses();
+
     }
+
   }
 
 
@@ -200,22 +288,30 @@ export class AvailableCourses implements OnInit {
       typeof body === 'string' &&
       body.trim()
     ) {
+
       return body;
+
     }
 
 
     if (body?.detail) {
+
       return body.detail;
+
     }
 
 
     if (body?.message) {
+
       return body.message;
+
     }
 
 
     if (body?.title) {
+
       return body.title;
+
     }
 
 
@@ -229,10 +325,14 @@ export class AvailableCourses implements OnInit {
         return messages
           .map(message => String(message))
           .join(' ');
+
       }
+
     }
 
 
     return fallback;
+
   }
+
 }

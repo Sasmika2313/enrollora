@@ -28,6 +28,60 @@
   margin: 0;
 }
 
+
+/* SEARCH */
+
+.course-search {
+  margin-bottom: 20px;
+}
+
+.search-box {
+  max-width: 520px;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid #e5e0ee;
+  border-radius: 11px;
+  padding: 0 13px;
+  box-shadow: 0 3px 12px rgba(35, 25, 60, 0.035);
+}
+
+.search-box > span {
+  font-size: 15px;
+  color: #8b5cf6;
+}
+
+.search-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #342c47;
+  font-size: 13px;
+}
+
+.search-box input::placeholder {
+  color: #aaa4b4;
+}
+
+.clear-search {
+  border: none;
+  background: transparent;
+  color: #8f879e;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 2px 5px;
+}
+
+.clear-search:hover {
+  color: #5f566d;
+}
+
+
+/* ALERTS */
+
 .alert {
   display: flex;
   align-items: center;
@@ -50,6 +104,9 @@
   color: #c24141;
   border: 1px solid #ffd4cd;
 }
+
+
+/* COURSE GRID */
 
 .course-grid {
   display: grid;
@@ -162,13 +219,33 @@
   border-radius: 10px;
 }
 
+
+/* COURSE BUTTONS */
+
+.details-btn {
+  width: 100%;
+  border: 1px solid #ddd5ec;
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin-top: 16px;
+  background: #faf8ff;
+  color: #7545ed;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.details-btn:hover {
+  background: #f1ebff;
+}
+
 .enroll-btn,
 .retry-btn {
   width: 100%;
   border: none;
   border-radius: 10px;
   padding: 11px 16px;
-  margin-top: 16px;
+  margin-top: 10px;
   background: linear-gradient(135deg, #7545ed, #ec4899);
   color: #fff;
   font-size: 13px;
@@ -182,6 +259,9 @@
   cursor: not-allowed;
   box-shadow: none;
 }
+
+
+/* STATE */
 
 .state-card {
   min-height: 280px;
@@ -233,8 +313,13 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
+
+
+/* PAGINATION */
 
 .pagination {
   display: flex;
@@ -279,13 +364,128 @@
   font-weight: 800;
 }
 
+
+/* COURSE DETAILS MODAL */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(35, 25, 55, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.course-modal {
+  position: relative;
+  width: min(500px, 100%);
+  background: #fff;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 20px 60px rgba(35, 25, 60, 0.22);
+}
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  border: none;
+  background: transparent;
+  color: #8f879e;
+  font-size: 27px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  color: #4b4259;
+}
+
+.modal-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 18px;
+  background: linear-gradient(135deg, #eee5ff, #fce7f3);
+  color: #8753d9;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.modal-eyebrow {
+  color: #8b5cf6;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+}
+
+.course-modal h2 {
+  margin: 7px 35px 22px 0;
+  color: #342c47;
+  font-size: 23px;
+}
+
+.modal-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.detail-item {
+  padding: 13px;
+  border-radius: 11px;
+  background: #faf9fc;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.detail-item span {
+  color: #9892a5;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.detail-item strong {
+  color: #514963;
+  font-size: 14px;
+}
+
+.modal-enroll-btn {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-top: 20px;
+  background: linear-gradient(135deg, #7545ed, #ec4899);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.modal-enroll-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+
+/* RESPONSIVE */
+
 @media (max-width: 1100px) {
+
   .course-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
 }
 
 @media (max-width: 700px) {
+
   .course-page {
     padding: 16px;
   }
@@ -298,4 +498,17 @@
     align-items: flex-start;
     flex-direction: column;
   }
+
+}
+
+@media (max-width: 520px) {
+
+  .course-modal {
+    padding: 24px;
+  }
+
+  .modal-details {
+    grid-template-columns: 1fr;
+  }
+
 }
